@@ -1,0 +1,16 @@
+{
+  "name": "pstacktesl",
+  "version": "1.0.0",
+  "description": "Paystack wallet simulation service",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "lint": "node --check src/server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.9.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2"
+  }
+}
