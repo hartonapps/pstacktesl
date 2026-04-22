@@ -1,0 +1,101 @@
+const crypto = require('crypto');
+
+const PAYSTACK_BASE_URL = 'https://api.paystack.co';
+
+function getHeaders() {
+  if (!process.env.PAYSTACK_SECRET_KEY) {
+    throw new Error('PAYSTACK_SECRET_KEY is missing in .env');
+  }
+
+  return {
+    Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+    'Content-Type': 'application/json'
+  };
+}
+
+async function paystackRequest(path, { method = 'POST', payload } = {}) {
+  const res = await fetch(`${PAYSTACK_BASE_URL}${path}`, {
+    method,
+    headers: getHeaders(),
+    body: payload ? JSON.stringify(payload) : undefined
+  });
+
+  const data = await res.json();
+
+  if (!res.ok || data.status === false) {
+    const message = data?.message || 'Paystack request failed';
+    throw new Error(message);
+  }
+
+  return data.data;
+}
+
+async function initializeDeposit({ email, amountKobo, reference, metadata, callbackUrl }) {
+  return paystackRequest('/transaction/initialize', {
+    payload: {
+      email,
+      amount: amountKobo,
+      reference,
+      metadata,
+      callback_url: callbackUrl
+    }
+  });
+}
+
+async function verifyTransaction(reference) {
+  return paystackRequest(`/transaction/verify/${encodeURIComponent(reference)}`, {
+    method: 'GET'
+  });
+}
+
+
+async function resolveBankAccount({ accountNumber, bankCode }) {
+  return paystackRequest(
+    `/bank/resolve?account_number=${encodeURIComponent(accountNumber)}&bank_code=${encodeURIComponent(bankCode)}`,
+    { method: 'GET' }
+  );
+}
+
+async function createTransferRecipient({ accountNumber, bankCode, name }) {
+  return paystackRequest('/transferrecipient', {
+    payload: {
+      type: 'nuban',
+      name,
+      account_number: accountNumber,
+      bank_code: bankCode,
+      currency: 'NGN'
+    }
+  });
+}
+
+async function initiateTransfer({ amountKobo, recipientCode, reference, reason }) {
+  return paystackRequest('/transfer', {
+    payload: {
+      source: 'balance',
+      amount: amountKobo,
+      recipient: recipientCode,
+      reason,
+      reference
+    }
+  });
+}
+
+function verifyWebhookSignature(rawBody, signature) {
+  if (!signature || !process.env.PAYSTACK_SECRET_KEY) return false;
+
+  const hash = crypto
+    .createHmac('sha512', process.env.PAYSTACK_SECRET_KEY)
+    .update(rawBody)
+    .digest('hex');
+
+  return hash === signature;
+}
+
+module.exports = {
+  initializeDeposit,
+  verifyTransaction,
+  resolveBankAccount,
+  createTransferRecipient,
+  initiateTransfer,
+  verifyWebhookSignature
+};

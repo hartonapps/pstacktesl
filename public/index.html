@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Paystack Wallet Simulator</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Paystack Wallet Simulator</h1>
+      <p class="muted">No Postman needed — use buttons below.</p>
+
+      <section class="card">
+        <h2>User Setup</h2>
+        <label>User ID <input id="userId" value="user123" /></label>
+        <label>Email <input id="email" value="test@example.com" /></label>
+        <button id="refreshWallet">Refresh Wallet</button>
+      </section>
+
+      <section class="card">
+        <h2>Deposit</h2>
+        <label>Amount (₦) <input id="depositAmount" type="number" value="100" min="1" /></label>
+        <button id="initDeposit">Initialize Deposit</button>
+        <div id="depositOutput" class="output"></div>
+        <button id="openAuthUrl" disabled>Open Paystack Payment Page</button>
+        <button id="simulateDepositSuccess" disabled>Simulate Deposit Success</button>
+      </section>
+
+      <section class="card">
+        <h2>Bank Details</h2>
+        <label>Account Number <input id="accountNumber" value="0123456789" /></label>
+        <label>Bank Code <input id="bankCode" value="058" /></label>
+        <button id="resolveBank">Resolve Bank Account</button>
+        <div id="resolveOutput" class="output"></div>
+        <label><input id="skipResolve" type="checkbox" /> Save without resolve (simulation only)</label>
+        <button id="saveBank">Save Bank Details</button>
+      </section>
+
+      <section class="card">
+        <h2>Withdrawal</h2>
+        <label>Amount (₦) <input id="withdrawAmount" type="number" value="100" min="100" /></label>
+        <button id="requestWithdrawal">Request Withdrawal</button>
+        <div id="withdrawOutput" class="output"></div>
+        <button id="simulateTransferSuccess" disabled>Simulate Transfer Success</button>
+        <button id="simulateTransferFailed" disabled>Simulate Transfer Failed</button>
+      </section>
+
+      <section class="card">
+        <h2>Wallet</h2>
+        <pre id="walletView">{}</pre>
+      </section>
+
+      <section class="card">
+        <h2>Transactions</h2>
+        <button id="loadTx">Load Transactions</button>
+        <pre id="txView">[]</pre>
+      </section>
+
+      <section class="card">
+        <h2>Status</h2>
+        <pre id="status">Ready.</pre>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
